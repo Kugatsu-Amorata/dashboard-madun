@@ -251,7 +251,14 @@ document.querySelector("#table tbody").innerHTML=html;
 
 document.getElementById("search").addEventListener("keyup",function(){
 
-let keyword=this.value.toLowerCase();
+let keyword=this.value.toLowerCase().trim();
+
+/* kalau kosong jangan tampilkan data */
+
+if(keyword === ""){
+document.querySelector("#table tbody").innerHTML="";
+return;
+}
 
 let filtered=dataGlobal.filter(d=>
 
@@ -263,7 +270,7 @@ d.cabang.toLowerCase().includes(keyword) ||
 d.phone.toLowerCase().includes(keyword)
 
 )
-    
+
 renderTable(filtered);
 
 });
