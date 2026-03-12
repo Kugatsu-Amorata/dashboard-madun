@@ -3,6 +3,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard Data Madha</title>
 
 <style>
@@ -110,7 +111,7 @@ background:#ddd;
     
 </style>
     
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 </head>
 
@@ -172,7 +173,7 @@ Priority
     <div id="cabangPage" style="display:none;">
 
 <h1>Data Cabang</h1>
-
+<input type="text" id="searchCabang" placeholder="Cari Cabang / Alamat / Telepon">
 <table id="cabangTable">
 
 <thead>
@@ -205,16 +206,18 @@ let priority=0;
 
 rows.forEach(r=>{
 
+if(!r) return;
+
 let col=r.split(",");
 
 let obj={
-agreement:col[0],
-nama:col[1],
-area:col[2],
-cabang:col[3],
-klasifikasi:col[4],
-plat:col[5],
-phone:col[6]
+agreement:col[0]?.trim(),
+nama:col[1]?.trim(),
+area:col[2]?.trim(),
+cabang:col[3]?.trim(),
+klasifikasi:col[4]?.trim(),
+plat:col[5]?.trim(),
+phone:col[6]?.trim()
 }
 
 dataGlobal.push(obj);
@@ -288,7 +291,8 @@ html+=`
 
 })
 
-document.querySelector("#table tbody").innerHTML=html;
+document.querySelector("#table tbody").innerHTML =
+html || `<tr><td colspan="7" style="text-align:center;">Tidak ada data</td></tr>`;
 
 }
 
@@ -332,29 +336,71 @@ document.getElementById("cabangPage").style.display="block";
 
 }
 const cabangUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR8N4KMXSbLh24-Y3Ar-bsj0_oYNqwiDVD7kjIS_IiE4vvVjdOteuUEIg_Cbrl69tz0NVjeWh_NxLS1/pub?gid=974265388&single=true&output=csv";
-
+let dataCabang = []; 
 fetch(cabangUrl)
 .then(res => res.text())
 .then(data => {
 
 const rows = data.split("\n").slice(1);
 
-let html="";
-
 rows.forEach(r=>{
+
+if(!r) return;
 
 let col=r.split(",");
 
-html+=`
-<tr>
-<td>${col[1]}</td>
-<td>${col[2]}</td>
-<td>${col[3]}</td>
-</tr>
-`
+let obj={
+cabang:col[1]?.trim(),
+alamat:col[2]?.trim(),
+telepon:col[3]?.trim()
+}
+dataCabang.push(obj);
+
 });
 
-document.querySelector("#cabangTable tbody").innerHTML=html;
+});
+
+
+function renderCabang(data){
+
+let html="";
+
+data.forEach(d=>{
+
+html+=`
+<tr>
+<td>${d.cabang}</td>
+<td>${d.alamat}</td>
+<td>${d.telepon}</td>
+</tr>
+`
+
+})
+
+document.querySelector("#cabangTable tbody").innerHTML =
+html || `<tr><td colspan="3" style="text-align:center;">Tidak ada data</td></tr>`;
+
+}
+    document.getElementById("searchCabang").addEventListener("keyup",function(){
+
+let keyword=this.value.toLowerCase().trim();
+
+/* jika kosong jangan tampilkan */
+
+if(keyword===""){
+document.querySelector("#cabangTable tbody").innerHTML="";
+return;
+}
+
+let filtered=dataCabang.filter(d=>
+
+d.cabang.toLowerCase().includes(keyword) ||
+d.alamat.toLowerCase().includes(keyword) ||
+d.telepon.toLowerCase().includes(keyword)
+
+)
+
+renderCabang(filtered);
 
 });
 </script>
