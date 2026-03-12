@@ -89,6 +89,24 @@ background:rgba(255,255,255,0.9);
 padding:20px;
 border-radius:10px;
 }
+
+.navbar{
+display:flex;
+gap:10px;
+margin-bottom:20px;
+}
+
+.navbar button{
+padding:10px 20px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+font-weight:bold;
+}
+
+.navbar button:hover{
+background:#ddd;
+}
     
 </style>
     
@@ -97,7 +115,13 @@ border-radius:10px;
 </head>
 
 <body>
+<div class="navbar">
 
+<button onclick="showPage('kmob')">KMOB</button>
+<button onclick="showPage('cabang')">Cabang</button>
+
+</div>
+    <div id="kmobPage">
 <h1>Dashboard Data Madha</h1>
 
 <div class="topSection">
@@ -144,7 +168,26 @@ Priority
 
 <tbody></tbody>
 </table>
+</div>
+    <div id="cabangPage" style="display:none;">
 
+<h1>Data Cabang</h1>
+
+<table id="cabangTable">
+
+<thead>
+<tr>
+<th>Cabang</th>
+<th>Alamat</th>
+<th>Telepon</th>
+</tr>
+</thead>
+
+<tbody></tbody>
+
+</table>
+
+</div>
 <script>
 
 const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT6ADg9gSdfwiOpfYZq47pZCEQ3yphM7WdLyENW_9t_NyvDM62nQvWioni4y4hbgHXblZibz0GSm-je/pub?gid=1801845643&single=true&output=csv";
@@ -274,7 +317,46 @@ d.phone.toLowerCase().includes(keyword)
 renderTable(filtered);
 
 });
+function showPage(page){
 
+document.getElementById("kmobPage").style.display="none";
+document.getElementById("cabangPage").style.display="none";
+
+if(page==="kmob"){
+document.getElementById("kmobPage").style.display="block";
+}
+
+if(page==="cabang"){
+document.getElementById("cabangPage").style.display="block";
+}
+
+}
+const cabangUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR8N4KMXSbLh24-Y3Ar-bsj0_oYNqwiDVD7kjIS_IiE4vvVjdOteuUEIg_Cbrl69tz0NVjeWh_NxLS1/pub?gid=974265388&single=true&output=csv";
+
+fetch(cabangUrl)
+.then(res => res.text())
+.then(data => {
+
+const rows = data.split("\n").slice(1);
+
+let html="";
+
+rows.forEach(r=>{
+
+let col=r.split(",");
+
+html+=`
+<tr>
+<td>${col[1]}</td>
+<td>${col[2]}</td>
+<td>${col[3]}</td>
+</tr>
+`
+});
+
+document.querySelector("#cabangTable tbody").innerHTML=html;
+
+});
 </script>
 
 </body>
